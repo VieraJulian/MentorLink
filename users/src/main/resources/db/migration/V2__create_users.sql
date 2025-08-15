@@ -1,0 +1,21 @@
+CREATE TABLE users (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    external_id CHAR(36) NOT NULL,
+    role_id BIGINT NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    firstname VARCHAR(20) NOT NULL,
+    lastname VARCHAR(20) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    country VARCHAR(20) NOT NULL,
+    state VARCHAR(50) NOT NULL,
+    timezone VARCHAR(100) NOT NULL,
+    image_url VARCHAR(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY users_external_id_unique (external_id),
+    UNIQUE KEY users_username_unique (username),
+    UNIQUE KEY users_email_unique (email),
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
