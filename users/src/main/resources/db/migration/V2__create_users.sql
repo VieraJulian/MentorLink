@@ -1,6 +1,6 @@
 CREATE TABLE users (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    external_id CHAR(36) NOT NULL,
+    external_id VARCHAR(36) NOT NULL,
     role_id BIGINT NOT NULL,
     username VARCHAR(50) NOT NULL,
     firstname VARCHAR(20) NOT NULL,
