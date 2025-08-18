@@ -41,12 +41,12 @@ public class User {
     private String email;
 
     @Setter
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 40)
     private String country;
 
     @Setter
-    @Column(nullable = false, length = 20)
-    private String state;
+    @Column(nullable = false, length = 40)
+    private String province;
 
     @Setter
     @Column(nullable = false, length = 100)
@@ -73,14 +73,14 @@ public class User {
     private Role role;
 
     @Builder
-    public User(String firstname, String externalId, String username, String lastname, String email, String country, String state, String timezone, String imageUrl, Role role) {
+    public User(String firstname, String externalId, String username, String lastname, String email, String country, String province, String timezone, String imageUrl, Role role) {
         this.firstname = firstname;
         this.externalId = externalId;
         this.username = username;
         this.lastname = lastname;
         this.email = email;
         this.country = country;
-        this.state = state;
+        this.province = province;
         this.timezone = timezone;
         this.imageUrl = imageUrl;
         this.role = role;
