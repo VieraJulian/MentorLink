@@ -1,4 +1,4 @@
-package com.mentorlink.users.infrastructure.outputs.rest.dto;
+package com.mentorlink.users.infrastructure.inputs.users.dto;
 
 public record UserResponse(
         String id,
