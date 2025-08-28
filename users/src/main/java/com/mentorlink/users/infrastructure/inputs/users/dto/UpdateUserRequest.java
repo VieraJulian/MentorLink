@@ -1,4 +1,4 @@
-package com.mentorlink.users.infrastructure.inputs.user.dto;
+package com.mentorlink.users.infrastructure.inputs.users.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
