@@ -14,7 +14,6 @@ public class KeycloakProvider {
     private static final String ADMIN_CLI = "admin-cli";
     private static final String USER_CONSOLE = "admin";
     private static final String PASSWORD_CONSOLE = "admin";
-    private static final String CLIENT_SECRET = "6jclaTgyQpLck0oxmNe4uIP247IEw2b9";
 
     public static RealmResource getRealmsResource() {
         Keycloak keycloak = KeycloakBuilder.builder()
@@ -23,7 +22,6 @@ public class KeycloakProvider {
                 .clientId(ADMIN_CLI)
                 .username(USER_CONSOLE)
                 .password(PASSWORD_CONSOLE)
-                .clientSecret(CLIENT_SECRET)
                 .resteasyClient(new ResteasyClientBuilderImpl()
                         .connectionPoolSize(10)
                 .build())
