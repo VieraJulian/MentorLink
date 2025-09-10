@@ -56,6 +56,19 @@ services:
     networks:
       - user_network
 
+  vault:
+    image: vault:1.13.3
+    container_name: vault
+    restart: always
+    ports:
+      - "${VAULT_PORT}:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID}
+      VAULT_DEV_LISTEN_ADDRESS: ${VAULT_DEV_LISTEN_ADDRESS}
+    cap_add:
+      - IPC_LOCK
+    command: server -dev
+
 volumes:
   mysql_data:
   postgres_data:
