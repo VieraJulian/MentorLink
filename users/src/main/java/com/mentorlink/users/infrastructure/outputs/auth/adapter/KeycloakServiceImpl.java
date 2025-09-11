@@ -5,7 +5,9 @@ import com.mentorlink.users.infrastructure.outputs.auth.dto.CreateIdentity;
 import com.mentorlink.users.infrastructure.outputs.auth.dto.UpdateIdentity;
 import com.mentorlink.users.infrastructure.outputs.auth.dto.UserIdentity;
 import com.mentorlink.users.infrastructure.outputs.auth.exception.KeycloakUserCreationException;
+import com.mentorlink.users.infrastructure.outputs.auth.exception.TokenRequestException;
 import com.mentorlink.users.infrastructure.outputs.auth.mapper.IUserIdentityMapper;
+import com.mentorlink.users.infrastructure.vault.VaultSecretReader;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.OAuth2Constants;
@@ -14,17 +16,38 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
 public class KeycloakServiceImpl implements IAuthProvider {
 
+    @Value("${KEYCLOAK_TARGET_REALM}")
+    private String targetRealm;
+
+    @Value("${KEYCLOAK_CLIENT_ID}")
+    private String clientId;
+
+    @Value("${KEYCLOAK_SERVER_URL}")
+    private String serverUrl;
+
     private final IUserIdentityMapper iUserIdentityMapper;
 
-    public KeycloakServiceImpl(IUserIdentityMapper iUserIdentityMapper) {
+    private final VaultSecretReader vaultSecretReader;
+
+    public KeycloakServiceImpl(IUserIdentityMapper iUserIdentityMapper, VaultSecretReader vaultSecretReader) {
+        this.vaultSecretReader = vaultSecretReader;
         this.iUserIdentityMapper = iUserIdentityMapper;
     }
 
@@ -82,6 +105,32 @@ public class KeycloakServiceImpl implements IAuthProvider {
                 .orElse("client");
 
         return iUserIdentityMapper.userRepresentationToUserIdentity(createdUser, role);
+    }
+
+    @Override
+    public String loginUser(String username, String password) {
+        String clientSecret = vaultSecretReader.getClientSecret(targetRealm, clientId);
+        String tokenUrl = serverUrl + "/realms/" + targetRealm + "/protocol/openid-connect/token";
+
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("grant_type", "password");
+        form.add("client_id", clientId);
+        form.add("client_secret", clientSecret);
+        form.add("username", username);
+        form.add("password", password);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(form, headers);
+
+        Map<String, Object> body = new RestTemplate().postForObject(tokenUrl, request, Map.class);
+
+        if (body == null || !body.containsKey("access_token")) {
+            throw new TokenRequestException("Failed to retrieve access token from Keycloak");
+        }
+
+        return body.get("access_token").toString();
     }
 
     @Override

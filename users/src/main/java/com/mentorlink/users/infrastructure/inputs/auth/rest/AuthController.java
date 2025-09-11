@@ -2,6 +2,7 @@ package com.mentorlink.users.infrastructure.inputs.auth.rest;
 
 import com.mentorlink.users.domain.port.inbound.IAuthApiPort;
 import com.mentorlink.users.infrastructure.inputs.auth.dto.CreateUserRequest;
+import com.mentorlink.users.infrastructure.inputs.auth.dto.LoginUserRequest;
 import com.mentorlink.users.infrastructure.inputs.common.response.ApiResponse;
 import com.mentorlink.users.infrastructure.inputs.common.response.UserResponse;
 import jakarta.validation.Valid;
@@ -34,6 +35,20 @@ public class AuthController {
                     .build();
 
             return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<?>> login(@RequestBody LoginUserRequest loginUserRequest) {
+        String token = iAuthApiPort.login(loginUserRequest);
+
+        ApiResponse<String> response = ApiResponse.<String>builder()
+                .status("success")
+                .message("User logged in successfully")
+                .data(token)
+                .metadata(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

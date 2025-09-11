@@ -5,10 +5,14 @@ import com.mentorlink.users.domain.enums.RoleName;
 import com.mentorlink.users.domain.port.inbound.IAuthApiPort;
 import com.mentorlink.users.domain.port.outbound.IAuthProvider;
 import com.mentorlink.users.infrastructure.inputs.auth.dto.CreateUserRequest;
+import com.mentorlink.users.infrastructure.inputs.auth.dto.LoginUserRequest;
 import com.mentorlink.users.infrastructure.inputs.common.response.UserResponse;
 import com.mentorlink.users.infrastructure.outputs.auth.dto.CreateIdentity;
 import com.mentorlink.users.infrastructure.outputs.auth.dto.UserIdentity;
+import org.apache.http.auth.InvalidCredentialsException;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AuthUseCase implements IAuthApiPort {
@@ -33,5 +37,10 @@ public class AuthUseCase implements IAuthApiPort {
         UserIdentity userIdentity = iAuthProvider.createUser(createIdentity);
 
         return iAuthRequestMapper.userIdentityToUserResponse(userIdentity);
+    }
+
+    @Override
+    public String login(LoginUserRequest loginUserRequest) {
+        return iAuthProvider.loginUser(loginUserRequest.username(), loginUserRequest.password());
     }
 }

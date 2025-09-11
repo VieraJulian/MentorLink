@@ -99,8 +99,6 @@ public class KeyCloakRealmInitializer {
                     .getValue();
 
             vaultSecretWriter.storeClientSecret(targetRealm, clientId, clientSecret);
-
-            String secret = vaultSecretReader.getClientSecret(targetRealm, clientId);
         }
     }
 }

@@ -12,6 +12,6 @@ public interface IAuthProvider {
     UserIdentity updateUser(String id, UpdateIdentity updateIdentity);
     void deleteUser(String id);
     Optional<UserIdentity> findUserById(String id);
-
+    String loginUser(String username, String password);
 
 }
