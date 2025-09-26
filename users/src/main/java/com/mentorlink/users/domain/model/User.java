@@ -1,7 +1,8 @@
 package com.mentorlink.users.domain.model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,8 +13,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
+@Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 @SQLDelete(sql = "UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 public class User {
@@ -29,30 +32,24 @@ public class User {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Setter
     @Column(nullable = false, length = 20)
     private String firstname;
 
-    @Setter
     @Column(nullable = false, length = 20)
     private String lastname;
 
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @Setter
     @Column(nullable = false, length = 40)
     private String country;
 
-    @Setter
     @Column(nullable = false, length = 40)
     private String province;
 
-    @Setter
     @Column(nullable = false, length = 100)
     private String timezone;
 
-    @Setter
     @Column(name = "image_url")
     private String imageUrl;
 
@@ -67,22 +64,7 @@ public class User {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Setter
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
-
-    @Builder
-    public User(String firstname, String externalId, String username, String lastname, String email, String country, String province, String timezone, String imageUrl, Role role) {
-        this.firstname = firstname;
-        this.externalId = externalId;
-        this.username = username;
-        this.lastname = lastname;
-        this.email = email;
-        this.country = country;
-        this.province = province;
-        this.timezone = timezone;
-        this.imageUrl = imageUrl;
-        this.role = role;
-    }
 }

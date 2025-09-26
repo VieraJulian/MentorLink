@@ -1,6 +1,5 @@
 package com.mentorlink.users.infrastructure.outputs.auth.adapter.config;
 
-import com.mentorlink.users.infrastructure.vault.VaultSecretReader;
 import com.mentorlink.users.infrastructure.vault.VaultSecretWriter;
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.Response;
@@ -41,10 +40,7 @@ public class KeyCloakRealmInitializer {
 
     private final VaultSecretWriter vaultSecretWriter;
 
-    private final VaultSecretReader vaultSecretReader;
-
-    public KeyCloakRealmInitializer(VaultSecretWriter vaultSecretWriter, VaultSecretReader vaultSecretReader) {
-        this.vaultSecretReader = vaultSecretReader;
+    public KeyCloakRealmInitializer(VaultSecretWriter vaultSecretWriter) {
         this.vaultSecretWriter = vaultSecretWriter;
     }
 

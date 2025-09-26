@@ -1,5 +1,7 @@
 package com.mentorlink.users.infrastructure.inputs.common.exception;
 
+import com.mentorlink.users.application.service.exception.AuthProviderUserCreationException;
+import com.mentorlink.users.application.service.exception.RoleNotFoundException;
 import com.mentorlink.users.infrastructure.inputs.common.response.ApiResponse;
 import com.mentorlink.users.infrastructure.outputs.auth.exception.KeycloakUserCreationException;
 import com.mentorlink.users.infrastructure.outputs.auth.exception.TokenRequestException;
@@ -25,7 +27,7 @@ public class GlobalExceptionHandler {
 
         ApiResponse<List<String>> response = ApiResponse.<List<String>>builder()
                 .status("error")
-                .message("Validation Error" )
+                .message("Validation Error")
                 .data(errors)
                 .metadata(null)
                 .build();
@@ -85,6 +87,34 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(AuthProviderUserCreationException.class)
+    public ResponseEntity<ApiResponse<?>> handleAuthProviderUserCreationError(AuthProviderUserCreationException ex) {
+        log.error("Auth Provider User Creation Error: {}", ex.getMessage());
+
+        ApiResponse<String> response = ApiResponse.<String>builder()
+                .status("error")
+                .message("Auth Provider User Creation Error")
+                .data(ex.getMessage())
+                .metadata(null)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleRoleNotFoundError(RoleNotFoundException ex) {
+        log.error("Role Not Found Error: {}", ex.getMessage());
+
+        ApiResponse<String> response = ApiResponse.<String>builder()
+                .status("error")
+                .message("Role Not Found Error")
+                .data(ex.getMessage())
+                .metadata(null)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
 }

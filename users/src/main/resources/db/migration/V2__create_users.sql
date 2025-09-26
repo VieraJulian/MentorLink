@@ -7,7 +7,7 @@ CREATE TABLE users (
     lastname VARCHAR(20) NOT NULL,
     email VARCHAR(50) NOT NULL,
     country VARCHAR(20) NOT NULL,
-    state VARCHAR(50) NOT NULL,
+    province VARCHAR(50) NOT NULL,
     timezone VARCHAR(100) NOT NULL,
     image_url VARCHAR(255),
     created_at TIMESTAMP NOT NULL,

@@ -1,29 +1,46 @@
 package com.mentorlink.users.application.service.auth;
 
-import com.mentorlink.users.application.service.auth.mapper.IAuthRequestMapper;
+import com.mentorlink.users.application.service.mapper.IAuthMapper;
+import com.mentorlink.users.application.service.exception.AuthProviderUserCreationException;
+import com.mentorlink.users.application.service.exception.RoleNotFoundException;
+import com.mentorlink.users.application.service.mapper.IUserMapper;
 import com.mentorlink.users.domain.enums.RoleName;
+import com.mentorlink.users.domain.location.ITimezone;
+import com.mentorlink.users.domain.model.Role;
+import com.mentorlink.users.domain.model.User;
 import com.mentorlink.users.domain.port.inbound.IAuthApiPort;
 import com.mentorlink.users.domain.port.outbound.IAuthProvider;
+import com.mentorlink.users.domain.port.outbound.IRoleSpiPort;
+import com.mentorlink.users.domain.port.outbound.IUserSpiPort;
 import com.mentorlink.users.infrastructure.inputs.auth.dto.CreateUserRequest;
 import com.mentorlink.users.infrastructure.inputs.auth.dto.LoginUserRequest;
 import com.mentorlink.users.infrastructure.inputs.common.response.UserResponse;
 import com.mentorlink.users.infrastructure.outputs.auth.dto.CreateIdentity;
 import com.mentorlink.users.infrastructure.outputs.auth.dto.UserIdentity;
-import org.apache.http.auth.InvalidCredentialsException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class AuthUseCase implements IAuthApiPort {
 
     private final IAuthProvider iAuthProvider;
 
-    private final IAuthRequestMapper iAuthRequestMapper;
+    private final IUserSpiPort iUserSpiPort;
 
-    public AuthUseCase(IAuthProvider iAuthProvider, IAuthRequestMapper iAuthRequestMapper) {
+    private final IRoleSpiPort iRoleSpiPort;
+
+    private final ITimezone iTimezone;
+
+    private final IAuthMapper iAuthMapper;
+
+    private final IUserMapper iUserMapper;
+
+    public AuthUseCase(IAuthProvider iAuthProvider, IAuthMapper iAuthMapper, IUserSpiPort iUserSpiPort, IRoleSpiPort iRoleSpiPort, ITimezone iTimezone, IUserMapper iUserMapper) {
+        this.iUserMapper = iUserMapper;
+        this.iTimezone = iTimezone;
+        this.iRoleSpiPort = iRoleSpiPort;
+        this.iUserSpiPort = iUserSpiPort;
         this.iAuthProvider = iAuthProvider;
-        this.iAuthRequestMapper = iAuthRequestMapper;
+        this.iAuthMapper = iAuthMapper;
     }
 
     @Override
@@ -32,11 +49,29 @@ public class AuthUseCase implements IAuthApiPort {
 
         String role = email.contains("@mentorlink.com") ? RoleName.ADMIN.name().toLowerCase() : RoleName.CLIENT.name().toLowerCase();
 
-        CreateIdentity createIdentity = iAuthRequestMapper.createUserRequestToCreateIdentity(createUserRequest, role);
+        CreateIdentity createIdentity = iAuthMapper.createUserRequestToCreateIdentity(createUserRequest, role);
 
         UserIdentity userIdentity = iAuthProvider.createUser(createIdentity);
 
-        return iAuthRequestMapper.userIdentityToUserResponse(userIdentity);
+        if (userIdentity == null) {
+            throw new AuthProviderUserCreationException("Error creating user with auth provider");
+        }
+
+        Role userRole = iRoleSpiPort.getRoleByName(RoleName.valueOf(userIdentity.role().toUpperCase()))
+                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + userIdentity.role()));
+
+        String timezone = iTimezone.getTimezoneByCountry(createUserRequest.country());
+
+        String country = createUserRequest.country();
+
+        String province = createUserRequest.province();
+
+        User userInfo = iUserMapper.userIdentityToUser(userIdentity, country, province, timezone, userRole);
+
+        User userCreated = iUserSpiPort.saveUser(userInfo);
+
+        return iUserMapper.userToUserResponse(userCreated);
+
     }
 
     @Override

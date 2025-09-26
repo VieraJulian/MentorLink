@@ -1,7 +1,11 @@
 package com.mentorlink.users.infrastructure.inputs.common.response;
 
+import lombok.Builder;
+
+@Builder
 public record UserResponse(
-        String id,
+        Long id,
+        String externalId,
         String username,
         String firstname,
         String lastname,
