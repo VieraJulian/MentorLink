@@ -139,7 +139,9 @@ public class KeycloakServiceImpl implements IAuthProvider {
 
     @Override
     public void deleteUser(String id) {
-
+        KeycloakProvider.getUserResource()
+                .get(id)
+                .remove();
     }
 
     @Override

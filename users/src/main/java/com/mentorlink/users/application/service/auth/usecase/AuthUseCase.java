@@ -3,6 +3,7 @@ package com.mentorlink.users.application.service.auth.usecase;
 import com.mentorlink.users.application.service.auth.mapper.IAuthMapper;
 import com.mentorlink.users.application.service.exception.AuthProviderUserCreationException;
 import com.mentorlink.users.application.service.exception.RoleNotFoundException;
+import com.mentorlink.users.application.service.exception.UserCreationException;
 import com.mentorlink.users.application.service.users.mapper.IUserMapper;
 import com.mentorlink.users.domain.enums.RoleName;
 import com.mentorlink.users.domain.port.outbound.ITimezone;
@@ -43,11 +44,10 @@ public class AuthUseCase implements IAuthApiPort {
         this.iAuthMapper = iAuthMapper;
     }
 
-    @Override
-    public UserResponse register(CreateUserRequest createUserRequest) {
+    @Override public UserResponse register(CreateUserRequest createUserRequest) {
         String email = createUserRequest.email();
 
-        String role = email.contains("@mentorlink.com") ? RoleName.ADMIN.name().toLowerCase() : RoleName.CLIENT.name().toLowerCase();
+        String role = email.contains("@mentorlink.com") ? RoleName.ADMIN.name() : RoleName.CLIENT.name();
 
         CreateIdentity createIdentity = iAuthMapper.createUserRequestToCreateIdentity(createUserRequest, role);
 
@@ -57,21 +57,26 @@ public class AuthUseCase implements IAuthApiPort {
             throw new AuthProviderUserCreationException("Error creating user with auth provider");
         }
 
-        Role userRole = iRoleSpiPort.getRoleByName(RoleName.valueOf(userIdentity.role().toUpperCase()))
-                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + userIdentity.role()));
+        try {
+            Role userRole = iRoleSpiPort.getRoleByName(RoleName.valueOf(userIdentity.role().toUpperCase()))
+                    .orElseThrow(() -> new RoleNotFoundException("Role not found: " + userIdentity.role()));
 
-        String timezone = iTimezone.getTimezoneByCountry(createUserRequest.country());
+            String timezone = iTimezone.getTimezoneByCountry(createUserRequest.country());
 
-        String country = createUserRequest.country();
+            String country = createUserRequest.country();
 
-        String province = createUserRequest.province();
+            String province = createUserRequest.province();
 
-        User userInfo = iUserMapper.userIdentityToUser(userIdentity, country, province, timezone, userRole);
+            User userInfo = iUserMapper.userIdentityToUser(userIdentity, country, province, timezone, userRole);
 
-        User userCreated = iUserSpiPort.saveUser(userInfo);
+            User userCreated = iUserSpiPort.saveUser(userInfo);
 
-        return iUserMapper.userToUserResponse(userCreated);
+            return iUserMapper.userToUserResponse(userCreated);
 
+        } catch (Exception e) {
+            iAuthProvider.deleteUser(userIdentity.id());
+            throw new UserCreationException("Error creating user");
+        }
     }
 
     @Override

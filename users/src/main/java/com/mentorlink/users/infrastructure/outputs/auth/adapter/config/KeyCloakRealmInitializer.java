@@ -64,7 +64,7 @@ public class KeyCloakRealmInitializer {
             realm.setEnabled(true);
             keycloak.realms().create(realm);
 
-            List<String> roles = List.of("admin", "client", "professional");
+            List<String> roles = List.of("ADMIN", "CLIENT", "PROFESSIONAL");
             for (String roleName : roles) {
                 RoleRepresentation role = new RoleRepresentation();
                 role.setName(roleName);
