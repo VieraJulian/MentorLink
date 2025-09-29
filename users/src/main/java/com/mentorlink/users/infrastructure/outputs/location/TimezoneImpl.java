@@ -1,9 +1,10 @@
-package com.mentorlink.users.domain.location;
+package com.mentorlink.users.infrastructure.outputs.location;
 
+import com.mentorlink.users.domain.port.outbound.ITimezone;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TimezoneImpl implements ITimezone{
+public class TimezoneImpl implements ITimezone {
 
     @Override
     public String getTimezoneByCountry(String country) {

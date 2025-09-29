@@ -1,4 +1,4 @@
-package com.mentorlink.users.application.service.mapper;
+package com.mentorlink.users.application.service.auth.mapper;
 
 import com.mentorlink.users.infrastructure.inputs.auth.dto.CreateUserRequest;
 import com.mentorlink.users.infrastructure.outputs.auth.dto.CreateIdentity;

@@ -1,11 +1,11 @@
-package com.mentorlink.users.application.service.auth;
+package com.mentorlink.users.application.service.auth.usecase;
 
-import com.mentorlink.users.application.service.mapper.IAuthMapper;
+import com.mentorlink.users.application.service.auth.mapper.IAuthMapper;
 import com.mentorlink.users.application.service.exception.AuthProviderUserCreationException;
 import com.mentorlink.users.application.service.exception.RoleNotFoundException;
-import com.mentorlink.users.application.service.mapper.IUserMapper;
+import com.mentorlink.users.application.service.users.mapper.IUserMapper;
 import com.mentorlink.users.domain.enums.RoleName;
-import com.mentorlink.users.domain.location.ITimezone;
+import com.mentorlink.users.domain.port.outbound.ITimezone;
 import com.mentorlink.users.domain.model.Role;
 import com.mentorlink.users.domain.model.User;
 import com.mentorlink.users.domain.port.inbound.IAuthApiPort;

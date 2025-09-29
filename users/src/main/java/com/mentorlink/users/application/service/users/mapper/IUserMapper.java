@@ -1,4 +1,4 @@
-package com.mentorlink.users.application.service.mapper;
+package com.mentorlink.users.application.service.users.mapper;
 
 import com.mentorlink.users.domain.model.Role;
 import com.mentorlink.users.domain.model.User;

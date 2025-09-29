@@ -1,4 +1,4 @@
-package com.mentorlink.users.domain.location;
+package com.mentorlink.users.domain.port.outbound;
 
 public interface ITimezone {
 
